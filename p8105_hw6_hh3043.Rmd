@@ -7,6 +7,7 @@ output: github_document
 ```{r}
 library(tidyverse)
 library(modelr)
+set.seed(1)
 ```
 
 # problem 1
@@ -124,6 +125,19 @@ er2 |>
 ```
 
 
+```{r}
+er2|> 
+  pivot_longer(
+    r_squared:log_b1_times_b2,
+    values_to = 'value',
+    names_to = 'quantities',
+  )|>
+  group_by(quantities) |> 
+  summarize(
+    ci_lower = quantile(value, 0.025,na.rm=TRUE), 
+    ci_upper = quantile(value, 0.975,na.rm=TRUE))
+
+```
 
 
 
