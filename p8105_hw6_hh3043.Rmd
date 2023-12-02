@@ -6,6 +6,7 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(modelr)
 ```
 
 # problem 1
@@ -78,6 +79,37 @@ weather_df =
     tmin = tmin / 10,
     tmax = tmax / 10) |>
   select(name, id, everything())
+
+boot_sample = function(df){
+   sample_frac(df, replace = TRUE)
+}
+
+
+er = weather_df |>
+  modelr::bootstrap(5000)|>
+  mutate(
+    models = map(strap, \(df) lm(tmax ~ tmin+prcp,data = df))
+  )|>
+  mutate(
+    result_beta = map(models, broom::tidy),
+    result_r_square = map(models,broom::glance)
+        )
+er2 = er|>
+  unnest(result_beta)|>
+  select(.id,term,estimate,result_r_square)|>
+  unnest(result_r_square)|>
+  select(.id,term,estimate,r.squared)|>
+    pivot_wider(
+    names_from = term,
+    values_from = estimate
+  )|>
+  mutate(
+    log_b1_times_b2 = log(tmin*prcp)
+  )|>
+  select(.id,r.squared,log_b1_times_b2)
+
+  
+
 ```
 
 
