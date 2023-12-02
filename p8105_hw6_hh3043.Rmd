@@ -106,9 +106,20 @@ er2 = er|>
   mutate(
     log_b1_times_b2 = log(tmin*prcp)
   )|>
-  select(.id,r.squared,log_b1_times_b2)
+  select(.id,r.squared,log_b1_times_b2)|>
+  janitor::clean_names()
 
-  
+er2 |>
+  select(r_squared)|>
+  ggplot(aes(x = r_squared))+
+  geom_density()
+
+er2 |>
+  select(log_b1_times_b2)|>
+  drop_na()|>
+  ggplot(aes(x = log_b1_times_b2))+
+  geom_density()
+
 
 ```
 
