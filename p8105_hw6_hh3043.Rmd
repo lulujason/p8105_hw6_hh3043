@@ -86,7 +86,7 @@ boot_sample = function(df){
 }
 
 
-er = weather_df |>
+weather_results = weather_df |>
   modelr::bootstrap(5000)|>
   mutate(
     models = map(strap, \(df) lm(tmax ~ tmin+prcp,data = df))
@@ -94,8 +94,7 @@ er = weather_df |>
   mutate(
     result_beta = map(models, broom::tidy),
     result_r_square = map(models,broom::glance)
-        )
-er2 = er|>
+        )|>
   unnest(result_beta)|>
   select(.id,term,estimate,result_r_square)|>
   unnest(result_r_square)|>
@@ -110,23 +109,23 @@ er2 = er|>
   select(.id,r.squared,log_b1_times_b2)|>
   janitor::clean_names()
 
-er2 |>
+weather_results |>
   select(r_squared)|>
   ggplot(aes(x = r_squared))+
   geom_density()
 
-er2 |>
+weather_results |>
   select(log_b1_times_b2)|>
   drop_na()|>
   ggplot(aes(x = log_b1_times_b2))+
   geom_density()
 
-num_na =  sum(is.na(er2$log_b1_times_b2))
+num_na =  sum(is.na(weather_results$log_b1_times_b2))
 ```
 both distribution of r.squared and log(beta1\*beta2) are left skewed,but distribution of  log(beta1\*beta2) is much more left skewed. We have a total of `r num_na`NA in our data.
 
 ```{r}
-er2|> 
+weather_results|> 
   pivot_longer(
     r_squared:log_b1_times_b2,
     values_to = 'value',
@@ -180,13 +179,14 @@ linmod_0 = lm(bwt~ .,data = birth_weight)|>
 
 ```
 
-we first build a model including all variables, and then choose variables by p-value and a little bit intuition.
+We first build a model including all variables as predictor, and this model is just for getting preliminary data of all predictors. Then I build a new model with predictors chosen by p-value and a little bit intuition. 
 
 ```{r}
 linmod_1 = lm(bwt~ bhead+blength+delwt+gaweeks+smoken+wtgain,data = birth_weight)|>
   broom::tidy()
 ```
 
+build the other two models.
 ```{r}
 linmod_2 <- lm(bwt ~ blength + gaweeks, data = birth_weight)|>
   broom::tidy()
@@ -234,7 +234,7 @@ cv_df |>
 
 ```
 
-
+Through the plot, we can see that model_1 has the lowest Root Mean Squared Error value,so I will pick model_1 be the best model.
 
 
 
