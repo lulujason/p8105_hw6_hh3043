@@ -187,6 +187,19 @@ linmod_1 = lm(bwt~ bhead+blength+delwt+gaweeks+smoken+wtgain,data = birth_weight
   broom::tidy()
 ```
 
+```{r}
+linmod_2 <- lm(bwt ~ blength + gaweeks, data = birth_weight)|>
+  broom::tidy()
+linmod_3 <- lm(bwt ~ bhead * blength * babysex, data = birth_weight)|>
+  broom::tidy()
+
+cv_df =
+  crossv_mc(birth_weight, 100) |> 
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble))
+cv_df
+```
 
 
 
