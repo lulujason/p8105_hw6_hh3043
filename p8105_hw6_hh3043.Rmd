@@ -129,7 +129,7 @@ weather_results |>
 num_na =  sum(is.na(weather_results$log_b1_times_b2))
 ```
 
-Distribution of r.squared is normal, and distribution log(beta1\*beta2) is left skewed.We have a total of `r num_na` NA in our data.
+Distribution of r.squared is normal, and distribution log(beta1\*beta2) is left skewed.We have a total of `r num_na` NA for log(beta1\*beta2) in our data.
 
 ```{r}
 weather_results|> 
