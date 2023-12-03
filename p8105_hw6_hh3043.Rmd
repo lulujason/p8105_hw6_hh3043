@@ -2,6 +2,12 @@
 title: "Untitled"
 output: github_document
 ---
+```{r}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE
+)
+```
 
 
 ```{r}
